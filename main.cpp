@@ -3,6 +3,7 @@
 #include <string.h>
 #include <istream>
 #include <ctype.h>
+#include <map>
 
 using namespace std;
 
@@ -13,6 +14,8 @@ using namespace std;
 //Last Line
 
 fstream InputFile;
+ofstream outputFile;
+map <string , int> symbol;
 char tempStr[1024];
 bool isFirstCall = true, symIsFirstCall = true, errorDetected = true, symIsFirstCall2 = true, newLine = true;
 int LineCount = 0, pass1error = 0, offset = 0;
@@ -64,31 +67,10 @@ char *getToken() {
                 newLine = true;
             }
         }
-//    if (newLine) {
-//        readLine(&InputFile, &line, &LineCount);
-//        //readLine(InputFile, line, LineCount);
-//        if (isFirstCall) {
-//            readLine(&InputFile, &line, &LineCount);
-//            strPointer = strtok(tempStr, " \t\n");
-//            if (strPointer == NULL) {
-//                return "error123";
-//            }
-//            isFirstCall = false;
-//            offset = strPointer - tempStr + 1;
-//        } else {
-//            strPointer = strtok(NULL, " \t\n");
-//            if (strPointer == NULL) {
-//                return "error123";
-//            }
-//            offset = strPointer - tempStr + 1;
-//        }
-//        return strPointer;
-
-    //}
-        // we try with next line
     }
 
 }
+
 void __parseerror(int errcode) {
     ofstream outputFile("output.txt", ofstream::trunc);
     string errstr[] = {
@@ -101,6 +83,31 @@ void __parseerror(int errcode) {
             "TOO_MANY_INSTR", //total num_instr exceeds memory size (512)
     };
     outputFile << "Parse Error line " << LineCount << " offset " << offset << ": " << errstr[errcode];
+    outputFile.close();
+}
+
+void __parseerror2(int errcode) {
+    ofstream outputFile("output.txt", ofstream::trunc);
+    string errstr[] = {
+            "Error: Absolute address exceeds machine size; zero used",
+            "Error: Relative address exceeds module size; zero used",
+            "Error: External address exceeds length of uselist; treated as immediate",
+            "Error: This variable is multiple times defined; first value used",
+            "Error: Illegal immediate value; treated as 9999",
+            "Error: Illegal opcode; treated as 9999"
+    };
+    if (errcode==6){
+        outputFile << "Error: %s is not defined; zero used";
+    } else if (errcode==7){
+        outputFile << "Warning: Module %d: %s too big %d (max=%d) assume zero relative\n";
+    } else if (errcode==8){
+        outputFile << "Warning: Module %d: %s appeared in the uselist but was not actually used\n";
+    } else if (errcode==9){
+        outputFile << "Warning: Module %d: %s was defined but never used\n";
+    }
+    else {
+        outputFile << errstr[errcode];
+    }
     outputFile.close();
 }
 
@@ -125,8 +132,8 @@ char *readSym() {
 //    }
     // verify that the token is [a-Z][a-Z0-9]* and no longer than 16
     if (!isalpha(*tok)) {
-        errorDetected = false;
         pass1error = 1;
+        __parseerror(pass1error);
         exit(-1);
     }
     return tok;
@@ -139,32 +146,37 @@ char readAEIR() {
 //    }
     // make sure only one character and its part 'A','E','I' or 'R'
     if (!isalnum(*tok)) {
-        errorDetected = false;
         pass1error = 2;
         exit(-1);
     }
     return *tok;
 }
 
-void createSymbol(char *sym, int value) {
-    ofstream outputFile;
+void  createSymbol() {
     outputFile.open("output.txt", ofstream::out | ofstream::app);
-    if (symIsFirstCall == true) {
-        outputFile << "Symbol Table\n";
-        cout << "Symbol Table\n";
-
-        outputFile << sym << "=" << value << "\n";
-        cout << sym << "=" << value << "\n";
-        symIsFirstCall = false;
-    } else {
-        outputFile << sym << "=" << value << "\n";
-        cout << sym << "=" << value << "\n";
+    cout << "Symbol Table\n";
+    outputFile << "Symbol Table\n";
+    for (const auto& [key, value]: symbol){
+        cout << key << "=" << value << endl;
+        outputFile << key << "=" << value << endl;
     }
+    //symbol.insert(pair<char*,int>(sym,value));
+//    if (symIsFirstCall == true) {
+//        outputFile << "Symbol Table\n";
+//        cout << "Symbol Table\n";
+//        symbol.insert(pair<char*,int>(sym,value));
+//        outputFile << sym << "=" << value << "\n";
+//        cout << sym << "=" << value << "\n";
+//        symIsFirstCall = false;
+//    } else {
+//        symbol.insert(pair<char*,int>(sym,value));
+//        outputFile << sym << "=" << value << "\n";
+//        cout << sym << "=" << value << "\n";
+//    }
     outputFile.close();
 }
 
 void memoryMap(int count, int operand) {
-    ofstream outputFile;
     outputFile.open("output.txt", ofstream::out | ofstream::app);
     if (symIsFirstCall2) {
         outputFile << "\nMemory Map\n";
@@ -179,26 +191,30 @@ void memoryMap(int count, int operand) {
     outputFile.close();
 }
 
+void clearUseList(string (*uselist)[20]){
+    for(auto& sym: *uselist){
+        sym.clear();
+    }
+}
+
 void Pass2() {
+    string uselist[20];
     InputFile.open("/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt", ios::in);
     string line;
     int value = 0, count = 000;
     while (!InputFile.eof()) {
-        //readLine(&InputFile, &line, &LineCount);
         int defcount = readInt();
         for (int i = 0; i < defcount; i++) {
             char *sym = readSym();
             int val = readInt();
         }
 
-        //readLine(&InputFile, &line, &LineCount);
-
+        clearUseList(&uselist);
         int usecount = readInt();
         for (int i = 0; i < usecount; i++) {
             char *sym = readSym();
+            uselist[i] = string(sym);
         }
-
-        //readLine(&InputFile, &line, &LineCount);
 
         int instcount = readInt();
         for (int i = 0; i < instcount; i++) {
@@ -208,10 +224,20 @@ void Pass2() {
                 memoryMap(count, operand + value);
                 count++;
             } else if (addressmode == 'E') {
-                operand = operand - operand%1000;
-                memoryMap(count, operand);
+                int remainder = operand%1000;
+                string searchSymbol = uselist[remainder];
+                int valueOperand = (operand - remainder) + symbol[searchSymbol];
+//                int remainder = (address)%1000;
+//                string AssSym = usearr[remainder];
+//                int fa = (address - remainder) + symtable[AssSym];
+//                mmaddress = fa;
+                memoryMap(count, valueOperand);
                 count++;
             } else if (addressmode == 'A') {
+                int remainder = operand - operand%1000;
+                if(remainder>511){
+
+                }
                 memoryMap(count, operand);
                 count++;
             } else {
@@ -224,23 +250,10 @@ void Pass2() {
     InputFile.close();
 }
 
-void readFile() {
-    std::ifstream in("/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt");
-    std::string contents((std::istreambuf_iterator<char>(in)),
-                         std::istreambuf_iterator<char>());
-    strcpy(tempStr, contents.c_str());
-    in.close();
-}
-
 void Pass1() {
-    //readFile();
-    //fstream InputFile;
     InputFile.open("/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt", ios::in);
-    //string line;
     int value = 0, tempValue;
     while (!InputFile.eof()) {
-        //readLine(&InputFile, &line, &LineCount);
-        //LineCount++;
         int defcount = readInt();
         if (defcount == -1){
             continue;
@@ -254,11 +267,11 @@ void Pass1() {
             char *sym = readSym();
             int val = readInt();
             value = val + value;
-            createSymbol(sym, value);
+            string key = string(sym);
+            symbol[key] = value;
+            //createSymbol(sym, value);
             value = value - val;
         }
-        //LineCount++;
-        //readLine(&InputFile, &line, &LineCount);
         int usecount = readInt();
         if (usecount == -1){
             continue;
@@ -270,8 +283,6 @@ void Pass1() {
         for (int i = 0; i < usecount; i++) {
             char *sym = readSym();
         }
-        //LineCount++;
-        //readLine(&InputFile, &line, &LineCount);
         int instcount = readInt();
         if (instcount == -1){
             continue;
@@ -288,6 +299,7 @@ void Pass1() {
         offset = 0;
     }
     InputFile.close();
+    createSymbol();
     Pass2();
 
 }
