@@ -9,10 +9,8 @@
 using namespace std;
 
 //TO-DO
-//symbol too long
-//calculate E
-//Memory Map needs to be 000
-//Last Line
+//Last Line offset
+//Does oppcode go for all?
 
 fstream InputFile;
 ofstream outputFile;
@@ -87,6 +85,7 @@ void __parseerror(int errcode) {
             "TOO_MANY_INSTR", //total num_instr exceeds memory size (512)
     };
     outputFile << "Parse Error line " << LineCount << " offset " << offset << ": " << errstr[errcode];
+    cout << "Parse Error line " << LineCount << " offset " << offset << ": " << errstr[errcode];
     outputFile.close();
 }
 
@@ -231,7 +230,7 @@ void checkUnusedSymbols(){
 
 void Pass2() {
     string uselist[20];
-    InputFile.open("/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt", ios::in);
+    InputFile.open(file, ios::in);
     string line;
     int value = 0, count = 000;
     while (!InputFile.eof()) {
@@ -254,7 +253,13 @@ void Pass2() {
             char addressmode = readAEIR();
             int operand = readInt();
             if (addressmode == 'R') {
-                memoryMap(count, operand + value);
+                if(operand>9999){
+                    memoryMap(count, 9999);
+                    __parseerror2(5);
+                }
+                else {
+                    memoryMap(count, operand + value);
+                }
                 count++;
             } else if (addressmode == 'E') {
                 int remainder = operand%1000;
@@ -279,7 +284,13 @@ void Pass2() {
                 }
                 count++;
             } else {
-                memoryMap(count, operand);
+                if(operand>9999){
+                    memoryMap(count, 9999);
+                    __parseerror2(4);
+                }
+                else {
+                    memoryMap(count, operand);
+                }
                 count++;
             }
         }
@@ -290,8 +301,8 @@ void Pass2() {
 }
 
 void Pass1() {
-    InputFile.open("/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt", ios::in);
-    int value = 0, tempValue;
+    InputFile.open(file, ios::in);
+    int value = 0, module=1;
     while (!InputFile.eof()) {
         int defcount = readInt();
         if (defcount == -1){
@@ -300,13 +311,17 @@ void Pass1() {
         if (defcount > 16) {
             pass1error = 4;
             __parseerror(pass1error);
-            break;
+            exit(-1);
         }
         for (int i = 0; i < defcount; i++) {
             char *sym = readSym();
             int val = readInt();
             value = val + value;
             string key = string(sym);
+            if (key.length() >16){
+                __parseerror(3);
+                exit(-1);
+            }
             if (symbol.find(key) != symbol.end()){
                // __parseerror2(3);
                 symbolError[key] = " Error: This variable is multiple times defined; first value used";
@@ -323,7 +338,8 @@ void Pass1() {
         }
         if (usecount > 16) {
             pass1error = 5;
-            break;
+            __parseerror(5);
+            exit(-1);
         }
         for (int i = 0; i < usecount; i++) {
             char *sym = readSym();
@@ -332,9 +348,9 @@ void Pass1() {
         if (instcount == -1){
             continue;
         }
-        if (instcount > 512) {
-            pass1error = 6;
-            break;
+        if (instcount >= 511) {
+            __parseerror(6);
+            exit(-1);
         }
         value = value + instcount;
         for (int i = 0; i < instcount; i++) {
@@ -351,6 +367,7 @@ void Pass1() {
 
 int main() {
     //cin >> file;
+    file = "/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt";
     Pass1();
 }
 
