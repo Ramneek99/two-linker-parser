@@ -4,6 +4,7 @@
 #include <istream>
 #include <ctype.h>
 #include <map>
+#include<set>
 
 using namespace std;
 
@@ -17,12 +18,14 @@ fstream InputFile;
 ofstream outputFile;
 map <string , int> symbol;
 map <string, string> symbolError;
+set<string> usedSymbols;
 char tempStr[1024];
 bool isFirstCall = true, symIsFirstCall = true, errorDetected = true, symIsFirstCall2 = true, newLine = true;
 int LineCount = 0, pass1error = 0, offset = 0;
 char *strPointer;
 int symInt[1024];
 char symChar[1024];
+string file;
 string line;
 
 void readLine(fstream *InputFile, string *line, int *LineCount) {
@@ -213,6 +216,19 @@ void clearUseList(string (*uselist)[20]){
     }
 }
 
+void checkUnusedSymbols(){
+    outputFile.open("output.txt", ofstream::out | ofstream::app);
+    for (const auto& [key, value]: symbol){
+        if (usedSymbols.find(key) == usedSymbols.end()){
+            char output[100];
+            sprintf(output, "\n\nWarning: Module %d: %s was defined but never used", 1, key.c_str());
+            outputFile << output;
+            cout << output;
+        }
+    }
+    outputFile.close();
+}
+
 void Pass2() {
     string uselist[20];
     InputFile.open("/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt", ios::in);
@@ -230,6 +246,7 @@ void Pass2() {
         for (int i = 0; i < usecount; i++) {
             char *sym = readSym();
             uselist[i] = string(sym);
+            usedSymbols.insert(string(sym));
         }
 
         int instcount = readInt();
@@ -268,6 +285,7 @@ void Pass2() {
         }
         value = value + instcount;
     }
+    checkUnusedSymbols();
     InputFile.close();
 }
 
@@ -332,7 +350,7 @@ void Pass1() {
 }
 
 int main() {
-    //readFile();
+    //cin >> file;
     Pass1();
 }
 
