@@ -16,6 +16,7 @@ using namespace std;
 fstream InputFile;
 ofstream outputFile;
 map <string , int> symbol;
+map <string, string> symbolError;
 char tempStr[1024];
 bool isFirstCall = true, symIsFirstCall = true, errorDetected = true, symIsFirstCall2 = true, newLine = true;
 int LineCount = 0, pass1error = 0, offset = 0;
@@ -87,7 +88,8 @@ void __parseerror(int errcode) {
 }
 
 void __parseerror2(int errcode) {
-    ofstream outputFile("output.txt", ofstream::trunc);
+    ofstream outputFile("output.txt", ios::out | ios::app);
+    outputFile << " ";
     string errstr[] = {
             "Error: Absolute address exceeds machine size; zero used",
             "Error: Relative address exceeds module size; zero used",
@@ -99,11 +101,11 @@ void __parseerror2(int errcode) {
     if (errcode==6){
         outputFile << "Error: %s is not defined; zero used";
     } else if (errcode==7){
-        outputFile << "Warning: Module %d: %s too big %d (max=%d) assume zero relative\n";
+        outputFile << "Warning: Module %d: %s too big %d (max=%d) assume zero relative";
     } else if (errcode==8){
-        outputFile << "Warning: Module %d: %s appeared in the uselist but was not actually used\n";
+        outputFile << "Warning: Module %d: %s appeared in the uselist but was not actually used";
     } else if (errcode==9){
-        outputFile << "Warning: Module %d: %s was defined but never used\n";
+        outputFile << "Warning: Module %d: %s was defined but never used";
     }
     else {
         outputFile << errstr[errcode];
@@ -157,8 +159,16 @@ void  createSymbol() {
     cout << "Symbol Table\n";
     outputFile << "Symbol Table\n";
     for (const auto& [key, value]: symbol){
-        cout << key << "=" << value << endl;
-        outputFile << key << "=" << value << endl;
+        outputFile << key << "=" << value;
+        cout << key << "=" << value;
+        if(symbolError.find(key) != symbolError.end()){
+            cout << symbolError[key] << endl;
+            outputFile << symbolError[key] << endl;
+        }else{
+            cout << endl;
+            outputFile << endl;
+        }
+
     }
     //symbol.insert(pair<char*,int>(sym,value));
 //    if (symIsFirstCall == true) {
@@ -180,13 +190,19 @@ void memoryMap(int count, int operand) {
     outputFile.open("output.txt", ofstream::out | ofstream::app);
     if (symIsFirstCall2) {
         outputFile << "\nMemory Map\n";
-        outputFile << count << ":" << operand << "\n";
+        outputFile << setfill('0') << std::setw(3) << count;
+        outputFile << ":" << operand;
         cout << "\nMemory Map\n";
-        cout << count << ":" << operand << "\n";
+        cout << setfill('0') << std::setw(3) << count;
+        cout << ":" << operand;
         symIsFirstCall2 = false;
     } else {
-        outputFile << count << ":" << operand << "\n";
-        cout << count << ":" << operand << "\n";
+        outputFile << "\n";
+        outputFile << setfill('0') << std::setw(3) << count;
+        outputFile << ":" << operand;
+        cout << "\n";
+        cout << setfill('0') << std::setw(3) << count;
+        cout << ":" << operand;
     }
     outputFile.close();
 }
@@ -225,20 +241,25 @@ void Pass2() {
                 count++;
             } else if (addressmode == 'E') {
                 int remainder = operand%1000;
-                string searchSymbol = uselist[remainder];
-                int valueOperand = (operand - remainder) + symbol[searchSymbol];
-//                int remainder = (address)%1000;
-//                string AssSym = usearr[remainder];
-//                int fa = (address - remainder) + symtable[AssSym];
-//                mmaddress = fa;
-                memoryMap(count, valueOperand);
+                if(remainder>=usecount){
+                    memoryMap(count, operand);
+                    __parseerror2(2);
+                }
+                else {
+                    string searchSymbol = uselist[remainder];
+                    int valueOperand = (operand - remainder) + symbol[searchSymbol];
+                    memoryMap(count, valueOperand);
+                }
                 count++;
             } else if (addressmode == 'A') {
-                int remainder = operand - operand%1000;
+                int remainder = operand%1000;
                 if(remainder>511){
-
+                    memoryMap(count, operand-remainder);
+                    __parseerror2(0);
                 }
-                memoryMap(count, operand);
+                else{
+                    memoryMap(count, operand);
+                }
                 count++;
             } else {
                 memoryMap(count, operand);
@@ -268,7 +289,13 @@ void Pass1() {
             int val = readInt();
             value = val + value;
             string key = string(sym);
-            symbol[key] = value;
+            if (symbol.find(key) != symbol.end()){
+               // __parseerror2(3);
+                symbolError[key] = " Error: This variable is multiple times defined; first value used";
+            }
+            else {
+                symbol[key] = value;
+            }
             //createSymbol(sym, value);
             value = value - val;
         }
