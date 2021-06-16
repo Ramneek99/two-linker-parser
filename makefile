@@ -18,4 +18,4 @@ CC = gcc
 #	$(CC) $(CFLAGS) -c main.cpp
 
 main: main.cpp
-	g++ -g main.cpp -o main
+	gcc -g main.cpp -o main

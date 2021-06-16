@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
-#include <string.h>
+#include <cstring>
 #include <istream>
-#include <ctype.h>
+#include <cctype>
 #include <map>
 #include<set>
 
