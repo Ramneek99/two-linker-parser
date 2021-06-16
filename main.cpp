@@ -50,12 +50,11 @@ char *getToken() {
         if (newLine == true) {
             readLine(&InputFile, &line, &LineCount);
             if (strlen(tempStr)==0) {
+                offset++;
                 return "";
             }
             strPointer = strtok(tempStr, " \t\n");
-            if(strPointer!= nullptr) {
-                offset = strPointer - tempStr + 1;
-            }
+            offset = strPointer - tempStr + 1;
             if (strPointer == NULL) {
                 newLine = true;
             }
@@ -208,7 +207,7 @@ void checkUnusedSymbols(set<string>* usedList,set<string>* actuallyUsed){
         if (actuallyUsed->find(symbols) == actuallyUsed->end()){
             // usedList does not found in actuallyUsed set.
             char output[100];
-            sprintf(output, "\nWarning: Module %d: %s appeared in the uselist but was not actually used", module, symbols.c_str());
+            sprintf(output, "Warning: Module %d: %s appeared in the uselist but was not actually used\n", module, symbols.c_str());
             outputFile << output;
             cout << output;
         }
@@ -222,13 +221,20 @@ void checkUndefinedSymbols(){
     for (const auto& [key, value]: symbol){
         if (usedSymbols.find(key) == usedSymbols.end()){
             char output[100];
-            sprintf(output, "\n\nWarning: Module %d: %s was defined but never used", symbolModule[key], key.c_str());
+            sprintf(output, "Warning: Module %d: %s was defined but never used\n", symbolModule[key], key.c_str());
             outputFile << output;
             cout << output;
         }
     }
     outputFile.close();
 }
+
+void addNewLine(){
+    outputFile.open("output.txt", ofstream::out | ofstream::app);
+    outputFile << "\n\n";
+    outputFile.close();
+}
+
 void checkSymbolSize(int instacount, int instructions){
     outputFile.open("output.txt", ofstream::out | ofstream::app);
     for (const auto& [key, value]: symbolSizeCheck){
@@ -346,6 +352,8 @@ void Pass2() {
         checkUnusedSymbols(&useListSet, &actuallyUsed);
         module++;
     }
+    // Print new line
+    addNewLine();
     checkUndefinedSymbols();
     InputFile.close();
 }
@@ -367,6 +375,13 @@ void Pass1() {
         for (int i = 0; i < defcount; i++) {
             char *sym = readSym();
             int val = readInt();
+            while (!InputFile.eof() && val == -1){
+                val = readInt();
+            }
+            if(val == -1 ){
+                __parseerror(0);
+                exit(-1);
+            }
             value = val + value;
             string key = string(sym);
             if (key.length() >16){
