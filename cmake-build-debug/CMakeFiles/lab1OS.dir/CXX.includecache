@@ -11,11 +11,11 @@ iostream
 -
 fstream
 -
-string.h
+cstring
 -
 istream
 -
-ctype.h
+cctype
 -
 map
 -
