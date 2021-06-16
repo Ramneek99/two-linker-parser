@@ -180,21 +180,21 @@ void memoryMap(int count, int operand) {
     if (symIsFirstCall2) {
         outputFile << "\nMemory Map\n";
         outputFile << setfill('0') << std::setw(3) << count;
-        outputFile << ":" ;
+        outputFile << ": " ;
         outputFile << setfill('0') << std::setw(4) << operand;
         cout << "\nMemory Map\n";
         cout << setfill('0') << std::setw(3) << count;
-        cout << ":";
+        cout << ": ";
         cout << setfill('0') << std::setw(4) << operand;
         symIsFirstCall2 = false;
     } else {
         outputFile << "\n";
         outputFile << setfill('0') << std::setw(3) << count;
-        outputFile << ":" ;
+        outputFile << ": " ;
         outputFile << setfill('0') << std::setw(4) << operand;
         cout << "\n";
         cout << setfill('0') << std::setw(3) << count;
-        cout << ":";
+        cout << ": ";
         cout << setfill('0') << std::setw(4) << operand;
     }
     outputFile.close();
@@ -237,6 +237,7 @@ void checkUndefinedSymbols(){
 void addNewLine(){
     outputFile.open("output.txt", ofstream::out | ofstream::app);
     outputFile << "\n\n";
+    cout << "\n\n";
     outputFile.close();
 }
 
@@ -290,7 +291,7 @@ void Pass2() {
                     int remainder = operand % 1000;
                     if (remainder >= instcount) {
                         memoryMap(count, operand-remainder +value);
-                        __parseerror2(2);
+                        __parseerror2(1);
                     }
                     else {
                         memoryMap(count, operand + value);
@@ -443,8 +444,8 @@ void Pass1() {
 }
 
 int main() {
-    cin >> file;
-//    file = "/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt";
+    //cin >> file;
+    file = "/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt";
     Pass1();
 }
 

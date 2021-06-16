@@ -67,10 +67,10 @@ RM = /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/rimmyaulakh/CLionProjects/lab1OS
+CMAKE_SOURCE_DIR = /Users/rimmyaulakh/CLionProjects/lab1OS2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/rimmyaulakh/CLionProjects/lab1OS/cmake-build-debug
+CMAKE_BINARY_DIR = /Users/rimmyaulakh/CLionProjects/lab1OS2/cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -99,9 +99,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rimmyaulakh/CLionProjects/lab1OS/cmake-build-debug/CMakeFiles /Users/rimmyaulakh/CLionProjects/lab1OS/cmake-build-debug//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rimmyaulakh/CLionProjects/lab1OS2/cmake-build-debug/CMakeFiles /Users/rimmyaulakh/CLionProjects/lab1OS2/cmake-build-debug//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rimmyaulakh/CLionProjects/lab1OS/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rimmyaulakh/CLionProjects/lab1OS2/cmake-build-debug/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -130,17 +130,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named lab1OS
+# Target rules for targets named lab1OS2
 
 # Build rule for target.
-lab1OS: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 lab1OS
-.PHONY : lab1OS
+lab1OS2: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 lab1OS2
+.PHONY : lab1OS2
 
 # fast build rule for target.
-lab1OS/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab1OS.dir/build.make CMakeFiles/lab1OS.dir/build
-.PHONY : lab1OS/fast
+lab1OS2/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab1OS2.dir/build.make CMakeFiles/lab1OS2.dir/build
+.PHONY : lab1OS2/fast
 
 main.o: main.cpp.o
 
@@ -148,7 +148,7 @@ main.o: main.cpp.o
 
 # target to build an object file
 main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab1OS.dir/build.make CMakeFiles/lab1OS.dir/main.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab1OS2.dir/build.make CMakeFiles/lab1OS2.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -157,7 +157,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab1OS.dir/build.make CMakeFiles/lab1OS.dir/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab1OS2.dir/build.make CMakeFiles/lab1OS2.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -166,7 +166,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab1OS.dir/build.make CMakeFiles/lab1OS.dir/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/lab1OS2.dir/build.make CMakeFiles/lab1OS2.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -177,7 +177,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... lab1OS"
+	@echo "... lab1OS2"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
