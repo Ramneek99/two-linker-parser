@@ -438,8 +438,8 @@ void Pass1() {
 }
 
 int main() {
-    //cin >> file;
-    file = "/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt";
+    cin >> file;
+    //file = "/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt";
     Pass1();
 }
 
