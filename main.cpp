@@ -7,7 +7,6 @@
 #include<set>
 #include <cstdlib>
 #include <iomanip>
-
 using namespace std;
 
 //TO-DO
@@ -125,9 +124,9 @@ int readInt() {
         return -1;
     }
     if (!isdigit(*tok)) {
-       pass1error = 0;
-       __parseerror(pass1error);
-       exit(-1);
+        pass1error = 0;
+        __parseerror(pass1error);
+        exit(-1);
     }
     int value = atoi(tok);
     return value;
@@ -308,7 +307,7 @@ void Pass2() {
                     int remainder = operand % 1000;
                     if (remainder >= usecount) {
                         memoryMap(count, operand);
-                        __parseerror2(2);
+                        __parseerror2(1);
                     } else {
                         string searchSymbol = uselist[remainder];
                         actuallyUsed.insert(searchSymbol);
@@ -396,7 +395,7 @@ void Pass1() {
                 exit(-1);
             }
             if (symbol.find(key) != symbol.end()){
-               // __parseerror2(3);
+                // __parseerror2(3);
                 symbolError[key] = " Error: This variable is multiple times defined; first value used";
             }
             else {
@@ -444,9 +443,9 @@ void Pass1() {
 
 }
 
-int main() {
-    cin >> file;
+int main(int argc, char **argv) {
+    file = string(argv[1]);
+    //cout << "file is " << file.c_str();
     //file = "/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt";
     Pass1();
 }
-
