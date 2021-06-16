@@ -156,7 +156,11 @@ void  createSymbol() {
     outputFile.open("output.txt", ofstream::out | ofstream::app);
     cout << "Symbol Table\n";
     outputFile << "Symbol Table\n";
-    for (const auto& [key, value]: symbol){
+    map<string, int>::iterator  it;
+    for (it = symbol.begin(); it != symbol.end(); it++){
+//    for (const auto& [key, value]: symbol){
+        string key = it->first;
+        int value = it->second;
         outputFile << key << "=" << value;
         cout << key << "=" << value;
         if(symbolError.find(key) != symbolError.end()){
@@ -440,7 +444,7 @@ void Pass1() {
 
 int main() {
     cin >> file;
-    //file = "/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt";
+//    file = "/Users/rimmyaulakh/CLionProjects/lab1OS/input.txt";
     Pass1();
 }
 
