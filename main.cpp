@@ -212,7 +212,7 @@ void checkUnusedSymbols(set<string>* usedList,set<string>* actuallyUsed){
         if (actuallyUsed->find(symbols) == actuallyUsed->end()){
             // usedList does not found in actuallyUsed set.
             char output[100];
-            sprintf(output, "Warning: Module %d: %s appeared in the uselist but was not actually used\n", module, symbols.c_str());
+            sprintf(output, "\nWarning: Module %d: %s appeared in the uselist but was not actually used", module, symbols.c_str());
             outputFile << output;
             cout << output;
         }
