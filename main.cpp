@@ -57,6 +57,7 @@ char *getToken() {
             }
             strPointer = strtok(tempStr, " \t\n");
             offset = strPointer - tempStr + 1;
+            lengthToken = strlen(strPointer);
             if (strPointer == NULL) {
                 newLine = true;
             }
