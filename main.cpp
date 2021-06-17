@@ -307,7 +307,7 @@ void Pass2() {
                     int remainder = operand % 1000;
                     if (remainder >= usecount) {
                         memoryMap(count, operand);
-                        __parseerror2(1);
+                        __parseerror2(2);
                     } else {
                         string searchSymbol = uselist[remainder];
                         actuallyUsed.insert(searchSymbol);
