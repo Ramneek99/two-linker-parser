@@ -29,6 +29,7 @@ string file;
 string line;
 string symbolPass2;
 int module=1;
+int lengthToken = 0;
 
 void readLine(fstream *InputFile, string *line, int *LineCount) {
     fill_n(tempStr, sizeof tempStr, 0);
@@ -51,7 +52,7 @@ char *getToken() {
         if (newLine == true) {
             readLine(&InputFile, &line, &LineCount);
             if (strlen(tempStr)==0) {
-                //offset++;
+                offset = offset + lengthToken;
                 return "";
             }
             strPointer = strtok(tempStr, " \t\n");
@@ -68,6 +69,7 @@ char *getToken() {
             strPointer = strtok(NULL, " \t\n");
             if (strPointer != NULL) { // found a token
                 offset = strPointer - tempStr + 1;
+                lengthToken = strlen(strPointer);
                 return strPointer;
             }
             else {
