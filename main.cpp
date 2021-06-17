@@ -150,6 +150,7 @@ char readAEIR() {
     // make sure only one character and its part 'A','E','I' or 'R'
     if (!isalnum(*tok)) {
         pass1error = 2;
+        __parseerror(pass1error);
         exit(-1);
     }
     return *tok;
