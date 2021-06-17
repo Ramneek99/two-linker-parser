@@ -51,7 +51,7 @@ char *getToken() {
         if (newLine == true) {
             readLine(&InputFile, &line, &LineCount);
             if (strlen(tempStr)==0) {
-                offset++;
+                //offset++;
                 return "";
             }
             strPointer = strtok(tempStr, " \t\n");
